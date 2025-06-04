@@ -1,21 +1,23 @@
 package nl.hu.bep.battlesnek.model;
 
+import java.util.List;
+
 public class Snake {
 
-    private int apiVersion;
-    private String author;
-    private String color;
-    private String head;
-    private String tail;
-    private float version;
+    private int id;
+    private String name;
+    private int health;
+    private List<Coord> body;
+    private Coord head;
+    private int length;
 
-    public Snake(int apiVersion, String author, String color, String head, String tail, float version) {
-        this.apiVersion = apiVersion;
-        this.author = author;
-        this.color = color;
+    public Snake(int id, String name, int health, List<Coord> body, Coord head, int length) {
+        this.id = id;
+        this.name = name;
+        this.health = health;
+        this.body = body;
         this.head = head;
-        this.tail = tail;
-        this.version = version;
+        this.length = length;
     }
 
     public Snake() {}
@@ -25,10 +27,10 @@ public class Snake {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Snake snake = (Snake) o;
-        return author.equals(snake.author);
+        return name.equals(snake.name);
     }
 
-    public String getAuthor() {
-        return author;
+    public String getName() {
+        return name;
     }
 }
