@@ -10,6 +10,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
 @Path("/")
 public class SnakeResource {
@@ -23,27 +25,32 @@ public class SnakeResource {
     }
 
     @POST
+    @Path("/start")
     @Produces(MediaType.APPLICATION_JSON)
     public Response start(GameState gameState) {
-        return Response.ok(gameState).build();
+        System.out.println(gameState.getGame().getId());
+        return Response.ok().build();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response makeMove(String requestBody) {
-        JsonReader reader = Json.createReader(new StringReader(requestBody));
         try {
-            int id = reader.readObject().getInt("id");
-            String name = reader.readObject().getString("name");
-            int health = reader.readObject().getInt("health");
-            Coord body = reader.readObject();
-            Coord head = reader.readObject();
-            int length = reader.readObject().getInt("length");
-            Snake snake = new Snake(id, name, health, body, head, length);
-            return Response.ok(snake).build();
+            Map<String, String> move = new HashMap<>();
+            move.put("move", "right");
+
+            return Response.ok(move).build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
+    }
+
+    @POST
+    @Path("/end")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response endGame(GameState gameState) {
+        System.out.println("Game ended: " + gameState.getGame().getId());
+        return Response.ok().build();
     }
 }

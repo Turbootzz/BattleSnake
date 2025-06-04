@@ -13,36 +13,20 @@ public class GameState {
         this.you = you;
     }
 
-    public Game getGame() {
-        return game;
-    }
+    public Game getGame() { return game; }
 
-    public void setGame(Game game) {
-        this.game = game;
-    }
+    public void setGame(Game game) { this.game = game; }
 
-    public int getTurn() {
-        return turn;
-    }
+    public int getTurn() { return turn; }
 
-    public void setTurn(int turn) {
-        this.turn = turn;
-    }
+    public void setTurn(int turn) { this.turn = turn; }
 
-    public Board getBoard() {
-        return board;
-    }
+    public Board getBoard() { return board; }
 
-    public void setBoard(Board board) {
-        this.board = board;
-    }
+    public void setBoard(Board board) { this.board = board; }
 
-    public Snake getYou() {
-        return you;
-    }
+    public Snake getYou() { return you; }
 
-    public void setYou(Snake you) {
-        this.you = you;
-    }
+    public void setYou(Snake you) { this.you = you; }
 }
 

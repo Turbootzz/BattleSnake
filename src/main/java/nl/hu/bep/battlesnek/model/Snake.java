@@ -30,7 +30,5 @@ public class Snake {
         return name.equals(snake.name);
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 }
