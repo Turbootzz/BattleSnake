@@ -3,6 +3,8 @@ package nl.hu.bep.battlesnek.webservices.snake;
 import nl.hu.bep.battlesnek.model.Coord;
 import nl.hu.bep.battlesnek.model.GameState;
 import nl.hu.bep.battlesnek.model.Snake;
+import nl.hu.bep.battlesnek.model.SnakeAppearance;
+import nl.hu.bep.battlesnek.utils.SnakeUtils;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -11,13 +13,13 @@ import java.util.*;
 
 @Path("/snake")
 public class SnakeResource {
+    private static SnakeAppearance appearance = new SnakeAppearance();
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSnake() {
         SnakePositionDTO dto = new SnakePositionDTO(0, 0);
-        //return "{\"x\":0,\"y\":0}";
-        return Response.ok(dto).build();
+        return Response.ok(appearance).build();
     }
 
     @POST
@@ -29,6 +31,7 @@ public class SnakeResource {
     }
 
     @POST
+    @Path("/move")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response makeMove(GameState gameState) {
@@ -39,20 +42,23 @@ public class SnakeResource {
             int boardWidth = gameState.getBoard().getWidth();
             int boardHeight = gameState.getBoard().getHeight();
 
-            if (head.getX() == 0) {
-                possibleMoves.remove("left");
-            }
-            if (head.getX() == boardWidth - 1) {
-                possibleMoves.remove("right");
-            }
-            if (head.getY() == 0) {
-                possibleMoves.remove("down");
-            }
-            if (head.getY() == boardHeight - 1) {
-                possibleMoves.remove("up");
+            // Remove moves that would go outside the board
+            if (head.getX() == 0) possibleMoves.remove("left");
+            if (head.getX() == boardWidth - 1) possibleMoves.remove("right");
+            if (head.getY() == 0) possibleMoves.remove("down");
+            if (head.getY() == boardHeight - 1) possibleMoves.remove("up");
+
+            // Filter unsafe moves (collisions)
+            List<String> safeMoves = SnakeUtils.getSafeMoves(head, gameState, possibleMoves);
+
+            // If no safe moves left, fallback to any possible move
+            if (safeMoves.isEmpty()) {
+                safeMoves = possibleMoves;
             }
 
-            String chosenMove = possibleMoves.get(new Random().nextInt(possibleMoves.size()));
+            // Choose randomly among safe moves
+            String chosenMove = safeMoves.get(new Random().nextInt(safeMoves.size()));
+
             return Response.ok(new SnakeMoveDTO(chosenMove)).build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST).build();
