@@ -1,4 +1,4 @@
-name: CI - Build & Test Battlesnake
+name: CI - BattleSnake Build Test and Deploy
 
 on:
   push:
