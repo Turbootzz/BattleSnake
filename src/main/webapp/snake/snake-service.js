@@ -1,20 +1,17 @@
 export default class SnakeService {
     async getSnake() {
-        //TODO: haal deze data van de server
-        // return Promise.resolve({
-        //     apiversion: "1",
-        //     author: "de dapper student",
-        //     color: "#ff0000",
-        //     head: "default",
-        //     tail: "default",
-        //     version: "0.1"
-        // });
-        const response = await fetch("http://localhost:8080");
+        const response = await fetch("http://localhost:8080/restservices/appearance");
         return await response.json();
     }
 
     async updateSnake(updatedSnake) {
-        //TODO: update je slang aan de server-kant met de nieuwe gegevens
-        return Promise.resolve();
+        const response = await fetch ("http://localhost:8080/restservices/appearance", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedSnake)
+        });
+        return response.ok;
     }
 }

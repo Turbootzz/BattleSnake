@@ -4,14 +4,14 @@ import java.util.List;
 
 public class Snake {
 
-    private int id;
+    private String id;
     private String name;
     private int health;
     private List<Coord> body;
     private Coord head;
     private int length;
 
-    public Snake(int id, String name, int health, List<Coord> body, Coord head, int length) {
+    public Snake(String id, String name, int health, List<Coord> body, Coord head, int length) {
         this.id = id;
         this.name = name;
         this.health = health;
@@ -30,5 +30,21 @@ public class Snake {
         return name.equals(snake.name);
     }
 
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+
     public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public int getHealth() { return health; }
+    public void setHealth(int health) { this.health = health; }
+
+    public List<Coord> getBody() { return body; }
+    public void setBody(List<Coord> body) { this.body = body; }
+
+    public Coord getHead() { return head; }
+    public void setHead(Coord head) { this.head = head; }
+
+    public int getLength() { return length; }
+    public void setLength(int length) { this.length = length; }
 }
