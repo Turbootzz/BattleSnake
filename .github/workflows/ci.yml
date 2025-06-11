@@ -22,6 +22,12 @@ jobs:
       - name: Build with Maven and run tests
         run: mvn clean package
 
+      - name: Save WAR as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: eindopdracht-war
+          path: target/eindopdracht-0.1.war
+
   docker:
     if: github.event_name == 'push' && github.repository_owner == 'Turbootzz'
     needs: build-and-test
@@ -32,6 +38,12 @@ jobs:
 
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Download built WAR
+        uses: actions/download-artifact@v4
+        with:
+          name: eindopdracht-war
+          path: target
 
       - name: Build Docker image
         run: docker build -t turboot/battlesnake:latest .
