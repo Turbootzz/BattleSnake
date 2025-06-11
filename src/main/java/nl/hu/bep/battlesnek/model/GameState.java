@@ -1,5 +1,8 @@
 package nl.hu.bep.battlesnek.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GameState {
     private Game game;
     private int turn;

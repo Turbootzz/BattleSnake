@@ -1,5 +1,8 @@
 package nl.hu.bep.battlesnek.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Coord {
     private int x;
     private int y;
