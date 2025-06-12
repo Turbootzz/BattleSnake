@@ -2,11 +2,12 @@ package nl.hu.bep.battlesnek.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GameRecord {
+public class GameRecord implements Serializable {
     private String gameId;
     private List<String> moves;
     private int totalTurns;

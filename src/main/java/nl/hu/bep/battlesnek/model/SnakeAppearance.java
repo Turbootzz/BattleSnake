@@ -2,8 +2,10 @@ package nl.hu.bep.battlesnek.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SnakeAppearance {
+public class SnakeAppearance implements Serializable  {
     private String apiversion;
     private String author;
     private String color;

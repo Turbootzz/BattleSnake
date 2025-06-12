@@ -1,21 +1,52 @@
 package nl.hu.bep.battlesnek.webservices.games;
 
+import nl.hu.bep.battlesnek.model.GameRecord;
+import nl.hu.bep.battlesnek.persistence.PersistenceManager;
+import nl.hu.bep.battlesnek.webservices.appearance.AppearanceResource;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Map;
+import java.util.Set;
 
-//@Path("/games")
+@Path("/games")
 public class GamesResource {
-//    @GET
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response getGames() {
-//        return Response.ok(GameStorage.getAll()).build();
-//    }
-//
-//    @DELETE
-//    @Path("{id}")
-//    public Response deleteGame(@PathParam("id") String gameId) {
-//        GameStorage.delete(gameId);
-//        return Response.ok().build();
-//    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getGameIds() {
+        Set<String> gameIds = PersistenceManager.getPlayedGames().keySet();
+        return Response.ok(gameIds).build();
+    }
+
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getGameDetails(@PathParam("id") String gameId) {
+        GameRecord game = PersistenceManager.getPlayedGames().get(gameId);
+        if (game == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        GameRecordDTO dto = new GameRecordDTO(
+                game.getGameId(),
+                game.getMoves(),
+                game.getTotalTurns()
+        );
+
+        return Response.ok(dto).build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public Response deleteGame(@PathParam("id") String gameId) {
+        Map<String, GameRecord> games = PersistenceManager.getPlayedGames();
+        if (games.remove(gameId) != null) {
+            PersistenceManager.saveDataToFile(AppearanceResource.getCurrentAppearance());
+            return Response.noContent().build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+    }
 }
