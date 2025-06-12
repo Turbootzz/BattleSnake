@@ -4,6 +4,7 @@ import nl.hu.bep.battlesnek.model.Coord;
 import nl.hu.bep.battlesnek.model.GameState;
 import nl.hu.bep.battlesnek.model.SnakeAppearance;
 import nl.hu.bep.battlesnek.utils.SnakeUtils;
+import nl.hu.bep.battlesnek.webservices.appearance.AppearanceResource;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -12,13 +13,10 @@ import java.util.*;
 
 @Path("/snake")
 public class SnakeResource {
-    private static SnakeAppearance appearance = new SnakeAppearance();
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSnake() {
-        SnakePositionDTO dto = new SnakePositionDTO(0, 0);
-        return Response.ok(appearance).build();
+        return Response.ok(AppearanceResource.getCurrentAppearance()).build();
     }
 
     @POST
