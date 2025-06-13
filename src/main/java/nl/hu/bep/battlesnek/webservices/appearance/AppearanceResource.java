@@ -5,6 +5,7 @@ import nl.hu.bep.battlesnek.persistence.BattlesnakeData;
 import nl.hu.bep.battlesnek.model.SnakeAppearance;
 import nl.hu.bep.battlesnek.persistence.PersistenceManager;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -20,6 +21,7 @@ public class AppearanceResource implements Serializable {
 
 
     @GET
+    @RolesAllowed("user")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAppearance() {
         return Response.ok(getCurrentAppearance()).build();
