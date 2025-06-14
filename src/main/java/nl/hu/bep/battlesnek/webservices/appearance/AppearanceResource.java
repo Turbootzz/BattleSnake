@@ -28,6 +28,7 @@ public class AppearanceResource implements Serializable {
     }
 
     @POST
+    @RolesAllowed("user")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateAppearance(AppearanceDTO dto) {
         // Update saved appearance with new data

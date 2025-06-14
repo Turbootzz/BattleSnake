@@ -1,8 +1,12 @@
 export default class GamesService {
     async getGameIds() {
-        //TODO: fetch alle games van de de service, idealiter zonder alle details
-        const response = await fetch('/restservices/games');
-        if (!response.ok) throw new Error('Failed to fetch game IDs');
+        const jwt = sessionStorage.getItem("JWT");
+        const response = await fetch("/restservices/games", {
+            headers: {
+                "Authorization": "Bearer " + jwt
+            }
+        });
+        if (!response.ok) throw new Error("Failed to fetch game IDs");
         return await response.json();
     }
 

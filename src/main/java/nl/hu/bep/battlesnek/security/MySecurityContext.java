@@ -17,12 +17,8 @@ public class MySecurityContext implements SecurityContext {
         return this.user;
     }
     @Override
-    public boolean isUserInRole(String s) {
-        if (user.getRole() != null) {
-            System.out.printf("%s equals %s", s, user.getRole());
-            return s.equalsIgnoreCase(user.getRole());
-        }
-        return false;
+    public boolean isUserInRole(String role) {
+        return user != null && user.getRole().equals(role);
     }
     @Override
     public boolean isSecure() {

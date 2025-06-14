@@ -4,6 +4,7 @@ import nl.hu.bep.battlesnek.model.GameRecord;
 import nl.hu.bep.battlesnek.persistence.PersistenceManager;
 import nl.hu.bep.battlesnek.webservices.appearance.AppearanceResource;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -14,6 +15,7 @@ import java.util.Set;
 public class GamesResource {
 
     @GET
+    @RolesAllowed("user")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getGameIds() {
         Set<String> gameIds = PersistenceManager.getPlayedGames().keySet();
@@ -22,6 +24,7 @@ public class GamesResource {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed("user")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getGameDetails(@PathParam("id") String gameId) {
         GameRecord game = PersistenceManager.getPlayedGames().get(gameId);
@@ -40,6 +43,7 @@ public class GamesResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("admin")
     public Response deleteGame(@PathParam("id") String gameId) {
         Map<String, GameRecord> games = PersistenceManager.getPlayedGames();
         if (games.remove(gameId) != null) {

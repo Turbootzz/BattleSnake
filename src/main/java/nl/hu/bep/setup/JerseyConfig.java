@@ -12,7 +12,7 @@ import static nl.hu.bep.battlesnek.webservices.appearance.AppearanceResource.loa
 public class JerseyConfig extends ResourceConfig {
     public JerseyConfig() {
         register(RolesAllowedDynamicFeature.class);
-        packages("nl.hu.bep.battlesnek.webservices");
+        packages("nl.hu.bep.battlesnek.webservices", "nl.hu.bep.battlesnek.security");
     }
 
     static {
