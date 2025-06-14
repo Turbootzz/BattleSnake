@@ -1,6 +1,12 @@
 export default class SnakeService {
     async getSnake() {
-        const response = await fetch("/restservices/appearance");
+        const jwt = sessionStorage.getItem("JWT");
+        const response = await fetch("/restservices/appearance", {
+            headers: {
+                "Authorization": "Bearer " + jwt
+            }
+        });
+        if (!response.ok) throw new Error("Failed to fetch snake appearance");
         return await response.json();
     }
 

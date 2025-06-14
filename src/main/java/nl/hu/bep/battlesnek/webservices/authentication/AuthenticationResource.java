@@ -31,6 +31,12 @@ public class AuthenticationResource {
         try {
             // Authenticate the user using the credentials provided
             String role = MyUser.validateLogin(logonRequest.username(), logonRequest.password());
+
+            if (role == null) {
+                // Throw exception to the catch block
+                throw new SecurityException("Invalid username or password");
+            }
+
             // Issue a token for the user
             String token = createToken(logonRequest.username(), role);
             // Return the token on the response
