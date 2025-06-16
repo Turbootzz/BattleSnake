@@ -14,8 +14,8 @@ import javax.ws.rs.core.SecurityContext;
 @Path("/user")
 public class UserResource {
     @GET
+    @RolesAllowed({"user", "admin"})
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed("user")
     public Response getCurrentUser(@Context SecurityContext sc) {
         MyUser user = (MyUser) sc.getUserPrincipal();
         UserDTO dto = new UserDTO(user.getName(), user.getRole());

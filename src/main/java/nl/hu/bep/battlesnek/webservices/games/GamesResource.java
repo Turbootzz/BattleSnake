@@ -14,7 +14,7 @@ import java.util.Set;
 public class GamesResource {
 
     @GET
-    @RolesAllowed("user")
+    @RolesAllowed({"user", "admin"})
     @Produces(MediaType.APPLICATION_JSON)
     public Response getGameIds() {
         FilePersistenceManager persistence = FilePersistenceManager.getInstance();
@@ -24,7 +24,7 @@ public class GamesResource {
 
     @GET
     @Path("/{id}")
-    @RolesAllowed("user")
+    @RolesAllowed({"user", "admin"})
     @Produces(MediaType.APPLICATION_JSON)
     public Response getGameDetails(@PathParam("id") String gameId) {
         FilePersistenceManager persistence = FilePersistenceManager.getInstance();

@@ -18,14 +18,14 @@ public class AppearanceResource implements Serializable {
     }
 
     @GET
-    @RolesAllowed("user")
+    @RolesAllowed({"user", "admin"})
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAppearance() {
         return Response.ok(getCurrentAppearance()).build();
     }
 
     @POST
-    @RolesAllowed("user")
+    @RolesAllowed("admin")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateAppearance(AppearanceDTO dto) {
         // Update saved appearance with new data

@@ -6,6 +6,8 @@ import nl.hu.bep.battlesnek.persistence.FilePersistenceManager;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.util.HashSet;
+import java.util.Set;
 
 @WebListener
 public class    MyServletContextListener implements ServletContextListener {
@@ -14,14 +16,12 @@ public class    MyServletContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         System.out.println("initializing application");
-        FilePersistenceManager persistence = new FilePersistenceManager();
-        persistence.init();
 
         String testPassword = System.getenv().getOrDefault("TEST_USER_PASSWORD", "test");
         String adminPassword = System.getenv().getOrDefault("ADMIN_USER_PASSWORD", "admin");
 
         MyUser testUser = new MyUser("test", testPassword, "user");
-        MyUser adminUser = new MyUser("admin", adminPassword, "admin");
+        MyUser adminUser = new MyUser("admin", adminPassword);
 
         if (MyUser.addUser(testUser) && MyUser.addUser(adminUser)) {
             sce.getServletContext().log("User 'test' and 'admin' successfully added with role their respective role");

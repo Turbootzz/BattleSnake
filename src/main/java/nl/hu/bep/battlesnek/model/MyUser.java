@@ -14,8 +14,8 @@ public class MyUser implements Principal {
 
     public MyUser(String name, String password) {
         this.name = name;
-        this.role = "admin";
         this.password = password;
+        this.role = "admin";
     }
 
     public MyUser(String name, String password, String role) {
@@ -51,8 +51,12 @@ public class MyUser implements Principal {
     }
 
     public static boolean addUser(MyUser user) {
-        if (users.contains(user)) return false;
+        if (users.contains(user)) {
+            System.out.println("User " + user.getName() + " already exists");
+            return false;
+        }
         users.add(user);
+        System.out.println("User " + user.getName() + " added");
         return true;
     }
 

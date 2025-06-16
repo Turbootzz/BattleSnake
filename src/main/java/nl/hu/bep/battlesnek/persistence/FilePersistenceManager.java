@@ -23,10 +23,12 @@ public class FilePersistenceManager implements PersistenceService {
                 System.getenv().getOrDefault("BATTLESNAKE_STORAGE", System.getProperty("user.home")),
                 "battlesnake.obj"
         );
+        init();
     }
 
     public FilePersistenceManager(Path customPath) {
         this.storagePath = customPath;
+        init();
     }
 
     // gets the instance of the persistence so that they are all the same
