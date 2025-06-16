@@ -1,8 +1,7 @@
 package nl.hu.bep.battlesnek.webservices.games;
 
 import nl.hu.bep.battlesnek.model.GameRecord;
-import nl.hu.bep.battlesnek.persistence.PersistenceManager;
-import nl.hu.bep.battlesnek.webservices.appearance.AppearanceResource;
+import nl.hu.bep.battlesnek.persistence.FilePersistenceManager;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
@@ -18,7 +17,8 @@ public class GamesResource {
     @RolesAllowed("user")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getGameIds() {
-        Set<String> gameIds = PersistenceManager.getPlayedGames().keySet();
+        FilePersistenceManager persistence = FilePersistenceManager.getInstance();
+        Set<String> gameIds = persistence.getPlayedGames().keySet();
         return Response.ok(gameIds).build();
     }
 
@@ -27,7 +27,8 @@ public class GamesResource {
     @RolesAllowed("user")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getGameDetails(@PathParam("id") String gameId) {
-        GameRecord game = PersistenceManager.getPlayedGames().get(gameId);
+        FilePersistenceManager persistence = FilePersistenceManager.getInstance();
+        GameRecord game = persistence.getPlayedGames().get(gameId);
         if (game == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -45,9 +46,10 @@ public class GamesResource {
     @Path("/{id}")
     @RolesAllowed("admin")
     public Response deleteGame(@PathParam("id") String gameId) {
-        Map<String, GameRecord> games = PersistenceManager.getPlayedGames();
+        FilePersistenceManager persistence = FilePersistenceManager.getInstance();
+        Map<String, GameRecord> games = persistence.getPlayedGames();
         if (games.remove(gameId) != null) {
-            PersistenceManager.saveDataToFile(AppearanceResource.getCurrentAppearance());
+            persistence.saveData();
             return Response.noContent().build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).build();

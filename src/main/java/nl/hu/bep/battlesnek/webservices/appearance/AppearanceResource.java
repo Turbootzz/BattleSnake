@@ -1,7 +1,7 @@
 package nl.hu.bep.battlesnek.webservices.appearance;
 
 import nl.hu.bep.battlesnek.model.SnakeAppearance;
-import nl.hu.bep.battlesnek.persistence.PersistenceManager;
+import nl.hu.bep.battlesnek.persistence.FilePersistenceManager;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
@@ -13,7 +13,8 @@ import java.io.Serializable;
 public class AppearanceResource implements Serializable {
     // Seperate static instance of the appearance
     public static SnakeAppearance getCurrentAppearance() {
-        return PersistenceManager.getAppearance();
+        FilePersistenceManager persistence = FilePersistenceManager.getInstance();
+        return persistence.getAppearance();
     }
 
     @GET
@@ -31,7 +32,9 @@ public class AppearanceResource implements Serializable {
         getCurrentAppearance().setColor(dto.color);
         getCurrentAppearance().setHead(dto.head);
         getCurrentAppearance().setTail(dto.tail);
-        PersistenceManager.saveDataToFile(getCurrentAppearance());
+
+        FilePersistenceManager persistence = FilePersistenceManager.getInstance();
+        persistence.saveData();
 
         return Response.ok().build();
     }

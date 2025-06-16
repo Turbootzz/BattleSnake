@@ -3,7 +3,7 @@ package nl.hu.bep.battlesnek.webservices.snake;
 import nl.hu.bep.battlesnek.model.Coord;
 import nl.hu.bep.battlesnek.model.GameRecord;
 import nl.hu.bep.battlesnek.model.GameState;
-import nl.hu.bep.battlesnek.persistence.PersistenceManager;
+import nl.hu.bep.battlesnek.persistence.FilePersistenceManager;
 import nl.hu.bep.battlesnek.utils.SnakeUtils;
 import nl.hu.bep.battlesnek.webservices.appearance.AppearanceResource;
 
@@ -35,7 +35,6 @@ public class SnakeResource {
     public Response makeMove(GameState gameState) {
         try {
             String gameId = gameState.getGame().getId();
-            String gameName = gameState.getGame().getName();
 
             List<String> possibleMoves = new ArrayList<>(List.of("up", "down", "left", "right"));
 
@@ -61,14 +60,15 @@ public class SnakeResource {
             String chosenMove = safeMoves.get(new Random().nextInt(safeMoves.size()));
 
             // Saves the moves from the game
-            Map<String, GameRecord> playedGames = PersistenceManager.getPlayedGames();
+            FilePersistenceManager persistence = FilePersistenceManager.getInstance();
+            Map<String, GameRecord> playedGames = persistence.getPlayedGames();
             GameRecord gameRecord = playedGames.getOrDefault(gameId, new GameRecord(gameId));
 
             gameRecord.addMove(chosenMove);
 
             playedGames.put(gameId, gameRecord);
-            PersistenceManager.setPlayedGames(playedGames);
-            PersistenceManager.saveDataToFile(AppearanceResource.getCurrentAppearance());
+            persistence.setPlayedGames(playedGames);
+            persistence.saveData();
 
 
             return Response.ok(new SnakeMoveDTO(chosenMove)).build();
@@ -86,15 +86,16 @@ public class SnakeResource {
 
         System.out.println("Game ended: " + gameName);
 
-        Map<String, GameRecord> playedGames = PersistenceManager.getPlayedGames();
+        FilePersistenceManager persistence = FilePersistenceManager.getInstance();
+        Map<String, GameRecord> playedGames = persistence.getPlayedGames();
 
         GameRecord gameRecord = playedGames.getOrDefault(gameId, new GameRecord(gameId));
         gameRecord.setTotalTurns(gameState.getTurn());
 
         playedGames.put(gameId, gameRecord);
 
-        PersistenceManager.setPlayedGames(playedGames);
-        PersistenceManager.saveDataToFile(AppearanceResource.getCurrentAppearance());
+        persistence.setPlayedGames(playedGames);
+        persistence.saveData();
 
         return Response.ok().build();
     }

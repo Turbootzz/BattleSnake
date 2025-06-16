@@ -7,11 +7,20 @@ import java.io.Serializable;
 import java.util.Map;
 
 public class BattlesnakeData implements Serializable {
-    public Map<String, GameRecord> playedGames;
-    public SnakeAppearance appearance;
+    private static final long serialVersionUID = 1L;
+    private final Map<String, GameRecord> playedGames;
+    private final SnakeAppearance appearance;
 
     public BattlesnakeData(Map<String, GameRecord> playedGames, SnakeAppearance appearance) {
         this.playedGames = playedGames;
         this.appearance = appearance;
+    }
+
+    public Map<String, GameRecord> getPlayedGames() {
+        return playedGames;
+    }
+
+    public SnakeAppearance getAppearance() {
+        return appearance;
     }
 }

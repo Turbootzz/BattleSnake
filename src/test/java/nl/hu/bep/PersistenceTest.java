@@ -1,12 +1,12 @@
 package nl.hu.bep;
 
+import nl.hu.bep.battlesnek.persistence.FilePersistenceManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import nl.hu.bep.battlesnek.model.GameRecord;
 import nl.hu.bep.battlesnek.model.SnakeAppearance;
 import nl.hu.bep.battlesnek.persistence.BattlesnakeData;
-import nl.hu.bep.battlesnek.persistence.PersistenceManager;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,10 +18,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class PersistenceTest {
     private final Path testStoragePath = Path.of(System.getProperty("user.home"), "battlesnake-test.obj");
+    private FilePersistenceManager persistence;
 
     @BeforeEach
     void setup() {
-        PersistenceManager.setStoragePath(testStoragePath);
+        persistence = new FilePersistenceManager(testStoragePath);
     }
 
     @Test
@@ -37,18 +38,18 @@ public class PersistenceTest {
         record.addMove("up");
         games.put("test-game", record);
 
-        PersistenceManager.setAppearance(testAppearance);
-        PersistenceManager.setPlayedGames(games);
-        PersistenceManager.saveDataToFile(testAppearance);
+        persistence.setAppearance(testAppearance);
+        persistence.setPlayedGames(games);
+        persistence.saveData();
 
         // Act
-        BattlesnakeData loadedData = PersistenceManager.loadDataFromFile();
+        BattlesnakeData loadedData = persistence.loadData();
 
         // Assert
         assertNotNull(loadedData);
-        assertEquals("test-game", loadedData.playedGames.keySet().iterator().next());
-        assertEquals("up", loadedData.playedGames.get("test-game").getMoves().get(0));
-        assertEquals("#FF0000", loadedData.appearance.getColor());
+        assertEquals("test-game", loadedData.getPlayedGames().keySet().iterator().next());
+        assertEquals("up", loadedData.getPlayedGames().get("test-game").getMoves().get(0));
+        assertEquals("#FF0000", loadedData.getAppearance().getColor());
     }
 
     @Test
@@ -59,7 +60,7 @@ public class PersistenceTest {
             fail("IOException could not remove file: " + e.getMessage());
         }
 
-        BattlesnakeData result = PersistenceManager.loadDataFromFile();
+        BattlesnakeData result = persistence.loadData();
 
         assertNull(result);
     }
@@ -74,18 +75,18 @@ public class PersistenceTest {
         Map<String, GameRecord> games = new HashMap<>();
         games.put("init-game", record);
 
-        PersistenceManager.setAppearance(testAppearance);
-        PersistenceManager.setPlayedGames(games);
-        PersistenceManager.saveDataToFile(testAppearance);
+        persistence.setAppearance(testAppearance);
+        persistence.setPlayedGames(games);
+        persistence.saveData();
         // Reset static fields
-        PersistenceManager.setAppearance(new SnakeAppearance());
-        PersistenceManager.setPlayedGames(new HashMap<>());
+        persistence.setAppearance(new SnakeAppearance());
+        persistence.setPlayedGames(new HashMap<>());
 
         // Act
-        PersistenceManager.init();
+        persistence.init();
 
-        assertEquals("#ABCDEF", PersistenceManager.getAppearance().getColor());
-        assertTrue(PersistenceManager.getPlayedGames().containsKey("init-game"));
+        assertEquals("#ABCDEF", persistence.getAppearance().getColor());
+        assertTrue(persistence.getPlayedGames().containsKey("init-game"));
     }
 
     @AfterEach

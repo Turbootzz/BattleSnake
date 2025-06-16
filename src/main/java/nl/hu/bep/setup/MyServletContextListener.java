@@ -1,7 +1,7 @@
 package nl.hu.bep.setup;
 
 import nl.hu.bep.battlesnek.model.MyUser;
-import nl.hu.bep.battlesnek.persistence.PersistenceManager;
+import nl.hu.bep.battlesnek.persistence.FilePersistenceManager;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -14,8 +14,8 @@ public class    MyServletContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         System.out.println("initializing application");
-
-        PersistenceManager.init();
+        FilePersistenceManager persistence = new FilePersistenceManager();
+        persistence.init();
 
         String testPassword = System.getenv().getOrDefault("TEST_USER_PASSWORD", "test");
         String adminPassword = System.getenv().getOrDefault("ADMIN_USER_PASSWORD", "admin");
