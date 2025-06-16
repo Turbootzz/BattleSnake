@@ -1,5 +1,7 @@
 package nl.hu.bep;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import nl.hu.bep.battlesnek.model.GameRecord;
 import nl.hu.bep.battlesnek.model.SnakeAppearance;
@@ -15,6 +17,13 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PersistenceTest {
+    private final Path testStoragePath = Path.of(System.getProperty("user.home"), "battlesnake-test.obj");
+
+    @BeforeEach
+    void setup() {
+        PersistenceManager.setStoragePath(testStoragePath);
+    }
+
     @Test
     void testSaveAndLoadData() {
         // Arrange
@@ -44,11 +53,10 @@ public class PersistenceTest {
 
     @Test
     void testLoadWithoutFileReturnsNull() {
-        Path path = Path.of(System.getProperty("user.home"), "battlesnake.obj");
         try {
-            Files.deleteIfExists(path);
+            Files.deleteIfExists(testStoragePath); // test file
         } catch (IOException e) {
-            fail("IOException tijdens verwijderen bestand: " + e.getMessage());
+            fail("IOException could not remove file: " + e.getMessage());
         }
 
         BattlesnakeData result = PersistenceManager.loadDataFromFile();
@@ -78,5 +86,14 @@ public class PersistenceTest {
 
         assertEquals("#ABCDEF", PersistenceManager.getAppearance().getColor());
         assertTrue(PersistenceManager.getPlayedGames().containsKey("init-game"));
+    }
+
+    @AfterEach
+    void reset() {
+        try {
+            Files.deleteIfExists(testStoragePath);
+        } catch (IOException e) {
+            fail("IOException trying to delite file: " + e.getMessage());
+        }
     }
 }

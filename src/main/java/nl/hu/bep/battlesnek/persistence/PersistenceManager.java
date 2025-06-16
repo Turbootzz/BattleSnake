@@ -12,10 +12,15 @@ import java.util.Map;
 public class PersistenceManager implements Serializable {
 
     // storage works local and in docker
-    private static final Path STORAGE_PATH = Path.of(
+    private static Path STORAGE_PATH = Path.of(
             System.getenv().getOrDefault("BATTLESNAKE_STORAGE", System.getProperty("user.home")),
             "battlesnake.obj"
     );
+
+    // setter to use different storage location for tests
+    public static void setStoragePath(Path newPath) {
+        STORAGE_PATH = newPath;
+    }
 
     // Loads saved data on startup
     public static void init() {
