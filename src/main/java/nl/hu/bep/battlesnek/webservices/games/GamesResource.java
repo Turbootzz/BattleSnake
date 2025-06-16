@@ -12,7 +12,6 @@ import java.util.Set;
 
 @Path("/games")
 public class GamesResource {
-
     @GET
     @RolesAllowed({"user", "admin"})
     @Produces(MediaType.APPLICATION_JSON)

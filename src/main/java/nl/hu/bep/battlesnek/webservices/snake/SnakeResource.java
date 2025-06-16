@@ -34,32 +34,34 @@ public class SnakeResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response makeMove(GameState gameState) {
         try {
-            String gameId = gameState.getGame().getId();
-
-            List<String> possibleMoves = new ArrayList<>(List.of("up", "down", "left", "right"));
-
             Coord head = gameState.getYou().getHead();
             int boardWidth = gameState.getBoard().getWidth();
             int boardHeight = gameState.getBoard().getHeight();
 
-            // Remove moves that would go outside the board
+            // Remove moves that would go into the wall
+            List<String> possibleMoves = new ArrayList<>(List.of("up", "down", "left", "right"));
             if (head.getX() == 0) possibleMoves.remove("left");
             if (head.getX() == boardWidth - 1) possibleMoves.remove("right");
             if (head.getY() == 0) possibleMoves.remove("down");
             if (head.getY() == boardHeight - 1) possibleMoves.remove("up");
 
-            // Filter unsafe moves (collisions)
+            // Filter unsafe moves (collision with snakes)
             List<String> safeMoves = SnakeUtils.getSafeMoves(head, gameState, possibleMoves);
+
+            String chosenMove;
 
             // If no safe moves left, fallback to any possible move
             if (safeMoves.isEmpty()) {
-                safeMoves = possibleMoves;
+                System.out.println("WARN: No safe moves detected! Moving " + possibleMoves.get(0) + " as a last resort.");
+                chosenMove = possibleMoves.get(0);
+            } else {
+                // There is atleast one safe move, SnakeUtils decides
+                chosenMove = SnakeUtils.getSmartMove(head, gameState, safeMoves);
             }
 
-            // Choose randomly among safe moves
-            String chosenMove = safeMoves.get(new Random().nextInt(safeMoves.size()));
+            // -- Persistency - Saves the moves from the game
+            String gameId = gameState.getGame().getId();
 
-            // Saves the moves from the game
             FilePersistenceManager persistence = FilePersistenceManager.getInstance();
             Map<String, GameRecord> playedGames = persistence.getPlayedGames();
             GameRecord gameRecord = playedGames.getOrDefault(gameId, new GameRecord(gameId));
@@ -69,7 +71,6 @@ public class SnakeResource {
             playedGames.put(gameId, gameRecord);
             persistence.setPlayedGames(playedGames);
             persistence.saveData();
-
 
             return Response.ok(new SnakeMoveDTO(chosenMove)).build();
         } catch (Exception e) {
