@@ -4,15 +4,14 @@ import nl.hu.bep.battlesnek.model.Coord;
 import nl.hu.bep.battlesnek.model.GameState;
 import nl.hu.bep.battlesnek.model.Snake;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SnakeUtils {
     // snake health
     private static final int HEALTH_THRESHOLD = 50;
 
+    // calculates the next coordinate based on a move.
     private static Coord getNextCoord(String move, Coord head) {
         return switch (move) {
             case "up" -> new Coord(head.getX(), head.getY() + 1);
@@ -23,21 +22,47 @@ public class SnakeUtils {
         };
     }
 
+    // Checks if a move is safe from collisions with walls or other snakes. MOST important survival.
     private static boolean isSafe(String move, Coord head, GameState gameState) {
-        Coord next = getNextCoord(move, head);
-        // check for collisions against enemies and itself
-        for (Snake snake : gameState.getBoard().getSnakes()) {
+        Coord nextPos = getNextCoord(move, head);
 
-            // Tail is a hitbox
-            for (Coord c : snake.getBody()) {
-                if (c.equals(next)) {
-                    return false; // collision
+        // 1. wall check
+        int width = gameState.getBoard().getWidth();
+        int height = gameState.getBoard().getHeight();
+        if (nextPos.getX() < 0 || nextPos.getX() >= width || nextPos.getY() < 0 || nextPos.getY() >= height) {
+            return false;
+        }
+
+        // 2. snake body check (for all snakes)
+        for (Snake snake : gameState.getBoard().getSnakes()) {
+            List<Coord> body = snake.getBody();
+            // loop through the snake body
+            for (int i = 0; i < body.size(); i++) {
+                if (nextPos.equals(body.get(i))) {
+                    // found a collision. is it deadly?
+
+                    // collision is non-deadly ONLY if it's with a tail of a snake that has NOT just eaten
+                    // enemy bodypart is always dangerous
+                    boolean isOurSnake = snake.getId().equals(gameState.getYou().getId());
+                    boolean isTail = (i == body.size() - 1);
+                    boolean hasJustEaten = snake.getHealth() == 100;
+
+                    if (isOurSnake && isTail && !hasJustEaten) {
+                        // this is our tail and its not growing. ONLY safe collision
+                        continue;
+                    } else {
+                        // This is a collision with a neck, a body part, or a non-moving tail. This is deadly
+                        return false;
+                    }
                 }
             }
         }
+
+        // if survived all checks, move is safe
         return true;
     }
 
+    // filters a list of possible moves to only the safe moves
     public static List<String> getSafeMoves(Coord head, GameState gameState, List<String> possibleMoves) {
         List<String> safeMoves = new ArrayList<>();
         for (String move : possibleMoves) {
@@ -48,77 +73,94 @@ public class SnakeUtils {
         return safeMoves;
     }
 
-    private static boolean isHeadToHeadRisk(String move, Coord head, GameState gameState, int myLength) {
+    // head to head risk if enemy snake is the same size or bigger
+    private static boolean isHeadToHeadRisk(String move, Coord head, GameState gameState) {
         Coord nextPos = getNextCoord(move, head);
-        for (Snake snake : gameState.getBoard().getSnakes()) {
-            if (snake.getId().equals(gameState.getYou().getId())) continue; // Skip You
+        int myLength = gameState.getYou().getLength();
 
-            Coord enemyHead = snake.getHead();
-            // If the enemy snake is the same length or bigger, then head to head is a risk
-            if (snake.getLength() >= myLength) {
-                // calculate possible enemy moves
-                if (calculateDistance(nextPos, enemyHead) == 1) {
-                    return true; // potential head to head collision
+        for (Snake enemy : gameState.getBoard().getSnakes()) {
+            if (enemy.getId().equals(gameState.getYou().getId())) continue; // Skip self
+
+            if (enemy.getLength() >= myLength) {
+                // This enemy is a threat in a head-to-head collision.
+                // Check if our next move is adjacent to their head.
+                if (calculateDistance(nextPos, enemy.getHead()) <= 1) {
+                    return true;
                 }
             }
         }
         return false;
     }
 
+    // calculates distance between coordinates
     private static int calculateDistance(Coord a, Coord b) {
         return Math.abs(a.getX() - b.getX()) + Math.abs(a.getY() - b.getY());
     }
 
     // -- Strategy functions --
 
-    // Optional is for if there is no food
     private static Optional<Coord> findNearestFood(Coord head, List<Coord> food) {
         return food.stream()
                 .min(Comparator.comparingInt(f -> calculateDistance(head, f)));
     }
 
+    // finds the nearest enemy snake that is smaller than us. Its optional because there is not always a smaller one
     private static Optional<Snake> findNearestSmallerEnemy(Coord head, GameState gameState) {
         int myLength = gameState.getYou().getLength();
         return gameState.getBoard().getSnakes().stream()
-                .filter(s -> !s.getId().equals(gameState.getYou().getId())) // Alleen vijanden
-                .filter(s -> s.getLength() < myLength) // Alleen vijanden die kleiner zijn
-                .min(Comparator.comparingInt(s -> calculateDistance(head, s.getHead()))); // Zoek de dichtstbijzijnde
+                .filter(s -> !s.getId().equals(gameState.getYou().getId())) // Must be an enemy
+                .filter(s -> s.getLength() < myLength) // Must be smaller
+                .min(Comparator.comparingInt(s -> calculateDistance(head, s.getHead()))); // Must be the closest
     }
 
     // -- core intelligense based on prioritylist --
 
     public static String getSmartMove(Coord head, GameState gameState, List<String> safeMoves) {
-        int myLength = gameState.getYou().getLength();
-
-        // 1. Prevent head to head collision with bigger enemy
-        List<String> saferMoves = new ArrayList<>(safeMoves);
-        saferMoves.removeIf(move -> isHeadToHeadRisk(move, head, gameState, myLength));
-
-        // if after filtering miltiple moves are available, then use the List,
-        // otherwise risk with original safeMoves
-        List<String> movesToConsider = !saferMoves.isEmpty() ? saferMoves : safeMoves;
-
-        // -- strategy decisions --
-
-        // strategy 1: search food if health is low (high priority)
+        // priority 1: if health is low
         if (gameState.getYou().getHealth() < HEALTH_THRESHOLD) {
             Optional<Coord> nearestFood = findNearestFood(head, gameState.getBoard().getFood());
             if (nearestFood.isPresent()) {
-                // sort safest moves baesd on nearest food
-                movesToConsider.sort(Comparator.comparingInt(m -> calculateDistance(getNextCoord(m, head), nearestFood.get())));
-                return movesToConsider.get(0); // best move to nearest food
+                // Sort the safe moves by which one gets us closer to the food.
+                safeMoves.sort(Comparator.comparingInt(m -> calculateDistance(getNextCoord(m, head), nearestFood.get())));
+                return safeMoves.get(0); // Return the best move towards food.
             }
         }
 
-        // strategy 2: Hunt small enemies if we are big
+        // priority 2: HUNT smaller snakes
         Optional<Snake> prey = findNearestSmallerEnemy(head, gameState);
         if (prey.isPresent()) {
-            // sort safest moves baesd on nearest enemy head
-            movesToConsider.sort(Comparator.comparingInt(m -> calculateDistance(getNextCoord(m, head), prey.get().getHead())));
-            return movesToConsider.get(0); // best move to nearest head
+            // only hunt if we are at least 2 parts longer.
+            if (gameState.getYou().getLength() > prey.get().getLength() + 1) {
+                // Sort moves by which one gets us closer to the prey's head.
+                safeMoves.sort(Comparator.comparingInt(m -> calculateDistance(getNextCoord(m, head), prey.get().getHead())));
+                return safeMoves.get(0); // Return the best move towards the prey.
+            }
         }
 
-        // strategy 3: FALLBACK
-        return movesToConsider.get(0);
+        // priority 3: food seeking (default behavior)
+        Optional<Coord> anyFood = findNearestFood(head, gameState.getBoard().getFood());
+        if (anyFood.isPresent()) {
+            // avoid head-to-head risks while looking for food.
+            List<String> lessRiskyMoves = safeMoves.stream()
+                    .filter(m -> !isHeadToHeadRisk(m, head, gameState))
+                    .collect(Collectors.toCollection(ArrayList::new));
+
+            if (!lessRiskyMoves.isEmpty()) {
+                // if we have less risky moves, use it
+                lessRiskyMoves.sort(Comparator.comparingInt(m -> calculateDistance(getNextCoord(m, head), anyFood.get())));
+                return lessRiskyMoves.get(0);
+            } else {
+                // if all safe moves are risky, take one and hope for the best :')
+                safeMoves.sort(Comparator.comparingInt(m -> calculateDistance(getNextCoord(m, head), anyFood.get())));
+                return safeMoves.get(0);
+            }
+        }
+
+        // priority 3: fallback
+        // this looks for a way to be able circle in an open space (camping mode)
+        Coord myTail = gameState.getYou().getBody().get(gameState.getYou().getBody().size() - 1);
+        safeMoves.sort(Comparator.comparingInt(m -> calculateDistance(getNextCoord(m, head), myTail)));
+
+        return safeMoves.get(0);
     }
 }

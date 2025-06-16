@@ -34,12 +34,35 @@ public class SnakeResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response makeMove(GameState gameState) {
         try {
+            // Get previous moves
+            String gameId = gameState.getGame().getId();
+            FilePersistenceManager persistence = FilePersistenceManager.getInstance();
+            GameRecord gameRecord = persistence.getPlayedGames().get(gameId);
+
+            String lastMove = null;
+            if (gameRecord != null && !gameRecord.getMoves().isEmpty()) {
+                // pick last move from its history
+                lastMove = gameRecord.getMoves().get(gameRecord.getMoves().size() - 1);
+            }
+
+            // change possible moves
+            List<String> possibleMoves = new ArrayList<>(List.of("up", "down", "left", "right"));
+
+            // prevent to collision into itself
+            if (lastMove != null) {
+                switch (lastMove) {
+                    case "up" -> possibleMoves.remove("down");
+                    case "down" -> possibleMoves.remove("up");
+                    case "left" -> possibleMoves.remove("right");
+                    case "right" -> possibleMoves.remove("left");
+                }
+            }
+
             Coord head = gameState.getYou().getHead();
             int boardWidth = gameState.getBoard().getWidth();
             int boardHeight = gameState.getBoard().getHeight();
 
             // Remove moves that would go into the wall
-            List<String> possibleMoves = new ArrayList<>(List.of("up", "down", "left", "right"));
             if (head.getX() == 0) possibleMoves.remove("left");
             if (head.getX() == boardWidth - 1) possibleMoves.remove("right");
             if (head.getY() == 0) possibleMoves.remove("down");
@@ -60,15 +83,12 @@ public class SnakeResource {
             }
 
             // -- Persistency - Saves the moves from the game
-            String gameId = gameState.getGame().getId();
-
-            FilePersistenceManager persistence = FilePersistenceManager.getInstance();
             Map<String, GameRecord> playedGames = persistence.getPlayedGames();
-            GameRecord gameRecord = playedGames.getOrDefault(gameId, new GameRecord(gameId));
+            GameRecord currentGameRecord = playedGames.getOrDefault(gameId, new GameRecord(gameId));
 
-            gameRecord.addMove(chosenMove);
+            currentGameRecord.addMove(chosenMove);
 
-            playedGames.put(gameId, gameRecord);
+            playedGames.put(gameId, currentGameRecord);
             persistence.setPlayedGames(playedGames);
             persistence.saveData();
 
