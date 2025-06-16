@@ -3,7 +3,6 @@ package nl.hu.bep.battlesnek.webservices.snake;
 import nl.hu.bep.battlesnek.model.Coord;
 import nl.hu.bep.battlesnek.model.GameRecord;
 import nl.hu.bep.battlesnek.model.GameState;
-import nl.hu.bep.battlesnek.model.SnakeAppearance;
 import nl.hu.bep.battlesnek.persistence.PersistenceManager;
 import nl.hu.bep.battlesnek.utils.SnakeUtils;
 import nl.hu.bep.battlesnek.webservices.appearance.AppearanceResource;

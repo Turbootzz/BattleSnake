@@ -17,7 +17,7 @@ function loadGame(hashId) {
     return gamesService.getReplay(id).then(gameDetails => {
         if (gameDetails) {
             let text = details.querySelector('pre');
-            text.innerText = JSON.stringify(gameDetails);
+            text.textContent = JSON.stringify(gameDetails, null, 2);
             details.classList.remove('hidden');
         } else {
             details.classList.add('hidden')

@@ -11,9 +11,11 @@ export default class SnakeService {
     }
 
     async updateSnake(updatedSnake) {
+        const jwt = sessionStorage.getItem("JWT");
         const response = await fetch ("/restservices/appearance", {
             method: "POST",
             headers: {
+                "Authorization": "Bearer " + jwt,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(updatedSnake)

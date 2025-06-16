@@ -3,7 +3,6 @@ package nl.hu.bep.battlesnek.webservices.authentication;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.crypto.MacProvider;
 import nl.hu.bep.battlesnek.model.MyUser;
 import nl.hu.bep.battlesnek.security.LogonRequest;
 

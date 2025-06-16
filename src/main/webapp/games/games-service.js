@@ -11,17 +11,25 @@ export default class GamesService {
     }
 
     async getReplay(gameId) {
-        //TODO: fetch de details van een enkele game. Let wel, het staat vrij wat voor informatie je precies toont
-        //zolang je maar laat zien dat je data kunt opslaan over meerdere zetten heen. Dus deze dummy-data is puur
-        //ter illustratie.
-        const response = await fetch(`/restservices/games/${gameId}`);
+        const jwt = sessionStorage.getItem("JWT");
+        const response = await fetch(`/restservices/games/${gameId}`, {
+            headers: {
+                "Authorization": "Bearer " + jwt,
+                "Content-Type": "application/json"
+            }
+        });
         if (!response.ok) throw new Error('Failed to fetch game replay');
         return await response.json();
     }
 
     async removeReplay(gameId) {
-        //TODO: gebruik fetch om een enkele game (bij de server) te deleten
-        const response = await fetch(`/restservices/games/${gameId}`, { method: 'DELETE' });
+        const jwt = sessionStorage.getItem("JWT");
+        const response = await fetch(`/restservices/games/${gameId}`, {
+            headers: {
+                "Authorization": "Bearer " + jwt
+            },
+            method: 'DELETE'
+        });
         if (!response.ok) throw new Error('Failed to delete game');
     }
 }

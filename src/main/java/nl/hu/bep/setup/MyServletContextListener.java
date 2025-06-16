@@ -1,6 +1,7 @@
 package nl.hu.bep.setup;
 
 import nl.hu.bep.battlesnek.model.MyUser;
+import nl.hu.bep.battlesnek.persistence.PersistenceManager;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -13,11 +14,19 @@ public class    MyServletContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         System.out.println("initializing application");
-        MyUser testUser = new MyUser("test", "test", "user");
-        if (MyUser.addUser(testUser)) {
-            sce.getServletContext().log("User 'test' successfully added with role 'user'");
+
+        PersistenceManager.init();
+
+        String testPassword = System.getenv().getOrDefault("TEST_USER_PASSWORD", "test");
+        String adminPassword = System.getenv().getOrDefault("ADMIN_USER_PASSWORD", "admin");
+
+        MyUser testUser = new MyUser("test", testPassword, "user");
+        MyUser adminUser = new MyUser("admin", adminPassword, "admin");
+
+        if (MyUser.addUser(testUser) && MyUser.addUser(adminUser)) {
+            sce.getServletContext().log("User 'test' and 'admin' successfully added with role their respective role");
         } else {
-            sce.getServletContext().log("User 'test' already existed");
+            sce.getServletContext().log("User 'test' and 'admin' already exists");
         }
 
         // Check if user is available
@@ -25,7 +34,14 @@ public class    MyServletContextListener implements ServletContextListener {
         if (loaded == null) {
             sce.getServletContext().log("Could not load User 'test'");
         } else {
-            sce.getServletContext().log("✅ User 'test' exists and has the role: " + loaded.getRole());
+            sce.getServletContext().log("User 'test' exists and has the role: " + loaded.getRole());
+        }
+
+        MyUser loadedAdmin = MyUser.getUserByName("admin");
+        if (loadedAdmin == null) {
+            sce.getServletContext().log("Could not load User 'admin'");
+        } else {
+            sce.getServletContext().log("User 'admin' exists and has the role: " + loaded.getRole());
         }
     }
 
