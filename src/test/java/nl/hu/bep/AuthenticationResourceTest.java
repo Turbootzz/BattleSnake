@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import nl.hu.bep.battlesnek.model.MyUser;
 import nl.hu.bep.battlesnek.security.LogonRequest;
+import nl.hu.bep.battlesnek.utils.PasswordUtils;
 import nl.hu.bep.battlesnek.webservices.authentication.AuthenticationResource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,8 @@ public class AuthenticationResourceTest {
 
     @BeforeAll
     static void setup() {
-        MyUser.addUser(new MyUser("testuser", "testpassword", "user"));
+        String hashedPassword = PasswordUtils.hashPassword("testpassword", PasswordUtils.generateSalt());
+        MyUser.addUser(new MyUser("testuser", hashedPassword, "user"));
     }
 
     @Test

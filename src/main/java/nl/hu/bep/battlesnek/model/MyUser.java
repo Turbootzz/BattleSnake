@@ -1,5 +1,7 @@
 package nl.hu.bep.battlesnek.model;
 
+import nl.hu.bep.battlesnek.utils.PasswordUtils;
+
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,7 @@ public class MyUser implements Principal {
 
     public static String validateLogin(String username, String password) {
         for (MyUser user : users) {
-            if (user.getName().equals(username) && user.password.equals(password)) {
+            if (user.getName().equals(username) && PasswordUtils.validatePassword(password, user.password)) {
                 return user.getRole();  // Geef de rol terug als login klopt
             }
         }
