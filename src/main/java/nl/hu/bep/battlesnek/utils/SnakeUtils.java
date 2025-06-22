@@ -113,6 +113,15 @@ public class SnakeUtils {
                 .min(Comparator.comparingInt(s -> calculateDistance(head, s.getHead()))); // Must be the closest
     }
 
+    private static boolean isHuntingRisk(String move, Coord head, Snake prey) {
+        Coord nextPos = getNextCoord(move, head);
+        // check if our next position is next to the prey's head.
+        if (calculateDistance(nextPos, prey.getHead()) <= 1) {
+            return true;
+        }
+        return false;
+    }
+
     // -- core intelligense based on prioritylist --
 
     public static String getSmartMove(Coord head, GameState gameState, List<String> safeMoves) {
@@ -131,9 +140,17 @@ public class SnakeUtils {
         if (prey.isPresent()) {
             // only hunt if we are at least 2 parts longer.
             if (gameState.getYou().getLength() > prey.get().getLength() + 1) {
-                // Sort moves by which one gets us closer to the prey's head.
-                safeMoves.sort(Comparator.comparingInt(m -> calculateDistance(getNextCoord(m, head), prey.get().getHead())));
-                return safeMoves.get(0); // Return the best move towards the prey.
+                // filter out moves that are too risky
+                List<String> saferHuntingMoves = safeMoves.stream()
+                        .filter(m -> !isHuntingRisk(m, head, prey.get()))
+                        .collect(Collectors.toCollection(ArrayList::new));
+
+                if (!saferHuntingMoves.isEmpty()) {
+                    // if we have safer options, use them.
+                    saferHuntingMoves.sort(Comparator.comparingInt(m -> calculateDistance(getNextCoord(m, head), prey.get().getHead())));
+                    return saferHuntingMoves.get(0);
+                }
+                // if all hunting moves are risky, we wont hunt
             }
         }
 
