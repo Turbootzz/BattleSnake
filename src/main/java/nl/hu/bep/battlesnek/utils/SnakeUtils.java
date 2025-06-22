@@ -156,10 +156,15 @@ public class SnakeUtils {
             }
         }
 
-        // priority 3: fallback
+        // priority 4: fallback
         // this looks for a way to be able circle in an open space (camping mode)
         Coord myTail = gameState.getYou().getBody().get(gameState.getYou().getBody().size() - 1);
-        safeMoves.sort(Comparator.comparingInt(m -> calculateDistance(getNextCoord(m, head), myTail)));
+        // sort moves by which one takes the snake furthest from our tail.
+        safeMoves.sort((m1, m2) -> {
+            int dist1 = calculateDistance(getNextCoord(m1, head), myTail);
+            int dist2 = calculateDistance(getNextCoord(m2, head), myTail);
+            return Integer.compare(dist2, dist1);
+        });
 
         return safeMoves.get(0);
     }
