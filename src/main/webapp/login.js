@@ -35,6 +35,8 @@ refresh();
 service.getUser().then(user => {
     if (!user) {
         service.logout();
+    } else { // gives the username to the frontend
+        document.getElementById("user").textContent = user.username;
     }
     refresh();
 })

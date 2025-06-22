@@ -14,7 +14,6 @@ public class SnakeAppearance implements Serializable  {
     private String version;
 
     public SnakeAppearance() {
-        // Default waarden (optioneel)
         this.apiversion = "1";
         this.author = "turbootzz";
         this.color = "#00FF00";

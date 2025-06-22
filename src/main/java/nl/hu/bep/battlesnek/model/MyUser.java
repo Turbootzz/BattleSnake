@@ -29,7 +29,7 @@ public class MyUser implements Principal {
     public static String validateLogin(String username, String password) {
         for (MyUser user : users) {
             if (user.getName().equals(username) && PasswordUtils.validatePassword(password, user.password)) {
-                return user.getRole();  // Geef de rol terug als login klopt
+                return user.getRole();  // Gets role after logging in successfully
             }
         }
         return null;

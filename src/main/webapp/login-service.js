@@ -29,6 +29,7 @@ export default class LoginService {
         if (!jwt) return Promise.resolve(null);
 
         return fetch("/restservices/user", {
+            method: "GET",
             headers: {
                 "Authorization": "Bearer " + jwt
             }
