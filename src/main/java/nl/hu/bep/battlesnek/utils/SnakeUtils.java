@@ -39,21 +39,8 @@ public class SnakeUtils {
             // loop through the snake body
             for (int i = 0; i < body.size(); i++) {
                 if (nextPos.equals(body.get(i))) {
-                    // found a collision. is it deadly?
-
-                    // collision is non-deadly ONLY if it's with a tail of a snake that has NOT just eaten
-                    // enemy bodypart is always dangerous
-                    boolean isOurSnake = snake.getId().equals(gameState.getYou().getId());
-                    boolean isTail = (i == body.size() - 1);
-                    boolean hasJustEaten = snake.getHealth() == 100;
-
-                    if (isOurSnake && isTail && !hasJustEaten) {
-                        // this is our tail and its not growing. ONLY safe collision
-                        continue;
-                    } else {
-                        // This is a collision with a neck, a body part, or a non-moving tail. This is deadly
-                        return false;
-                    }
+                    // found a collision. all colisions are deadly
+                    return false;
                 }
             }
         }
