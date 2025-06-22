@@ -1,8 +1,10 @@
 package nl.hu.bep.battlesnek.persistence;
 
+import nl.hu.bep.battlesnek.model.Feedback;
 import nl.hu.bep.battlesnek.model.GameRecord;
 import nl.hu.bep.battlesnek.model.SnakeAppearance;
 
+import java.util.List;
 import java.util.Map;
 
 public interface PersistenceService {
@@ -13,4 +15,6 @@ public interface PersistenceService {
     void setPlayedGames(Map<String, GameRecord> games);
     SnakeAppearance getAppearance();
     void setAppearance(SnakeAppearance appearance);
+    List<Feedback> getFeedbackList();
+    void addFeedback(Feedback feedback);
 }

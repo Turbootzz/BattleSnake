@@ -5,9 +5,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Game Logs</title>
+    <title>Feedback</title>
     <link rel="stylesheet" href="../site.css">
-    <link rel="stylesheet" href="./games.css">
+    <link rel="stylesheet" href="./feedback.css">
 
     <link rel="icon" href="../favicon.ico">
 </head>
@@ -32,15 +32,15 @@
 <nav>
     <ul>
         <li><a href="../snake/snake.html">Metadata</a></li>
-        <li><a href="./games.html">Games</a></li>
-        <li><a href="../feedback/feedback.html">Feedback</a></li>
+        <li><a href="../games/games.html">games</a></li>
+        <li><a href="./feedback.html">feedback</a></li>
     </ul>
 </nav>
 
 <main>
     <div>
-        <h2>Games</h2>
-        <ul id="games"></ul>
+        <h2>feedback</h2>
+        <ul id="feedback"></ul>
     </div>
     <div id="details" class="hidden">
         <h2>Details</h2>
@@ -49,7 +49,14 @@
         </pre>
     </div>
 
+    <div>
+        <h2>Give your feedback</h2>
+        <form id="feedback-form">
+            <textarea name="message" placeholder="Give your feedback..."></textarea>
+            <button type="submit">Send</button>
+        </form>
+    </div>
 </main>
-<script type="module" src="games.js"></script>
+<script type="module" src="feedback.js"></script>
 </body>
 </html>

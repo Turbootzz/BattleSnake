@@ -1,12 +1,15 @@
 package nl.hu.bep.battlesnek.persistence;
 
+import nl.hu.bep.battlesnek.model.Feedback;
 import nl.hu.bep.battlesnek.model.GameRecord;
 import nl.hu.bep.battlesnek.model.SnakeAppearance;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FilePersistenceManager implements PersistenceService {
@@ -17,6 +20,7 @@ public class FilePersistenceManager implements PersistenceService {
 
     private Map<String, GameRecord> playedGames = new HashMap<>();
     private SnakeAppearance appearance = new SnakeAppearance();
+    private List<Feedback> feedbackList = new ArrayList<>();
 
     public FilePersistenceManager() {
         this.storagePath = Path.of(
@@ -46,13 +50,14 @@ public class FilePersistenceManager implements PersistenceService {
         if (data != null) {
             this.playedGames = data.getPlayedGames() != null ? data.getPlayedGames() : new HashMap<>();
             this.appearance = data.getAppearance() != null ? data.getAppearance() : new SnakeAppearance();
+            this.feedbackList = data.getFeedbackList() != null ? data.getFeedbackList() : new ArrayList<>();
         }
     }
 
     @Override
     public void saveData() {
         try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(storagePath))) {
-            oos.writeObject(new BattlesnakeData(playedGames, appearance));
+            oos.writeObject(new BattlesnakeData(playedGames, appearance, feedbackList));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -88,5 +93,16 @@ public class FilePersistenceManager implements PersistenceService {
     @Override
     public void setAppearance(SnakeAppearance appearance) {
         this.appearance = appearance;
+    }
+
+    @Override
+    public List<Feedback> getFeedbackList() {
+        return feedbackList;
+    }
+
+    @Override
+    public void addFeedback(Feedback feedback) {
+        feedbackList.add(feedback);
+        saveData(); // instant save
     }
 }
