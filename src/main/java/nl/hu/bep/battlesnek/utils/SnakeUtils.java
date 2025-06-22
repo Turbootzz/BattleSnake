@@ -133,8 +133,26 @@ public class SnakeUtils {
                         .collect(Collectors.toCollection(ArrayList::new));
 
                 if (!saferHuntingMoves.isEmpty()) {
-                    // if we have safer options, use them.
-                    saferHuntingMoves.sort(Comparator.comparingInt(m -> calculateDistance(getNextCoord(m, head), prey.get().getHead())));
+                    Coord preyHead = prey.get().getHead();
+                    Coord myTail = gameState.getYou().getBody().get(gameState.getYou().getBody().size() - 1);
+
+                    saferHuntingMoves.sort((m1, m2) -> {
+                        // goal 1: get closer to the prey.
+                        int preyDist1 = calculateDistance(getNextCoord(m1, head), preyHead);
+                        int preyDist2 = calculateDistance(getNextCoord(m2, head), preyHead);
+                        int preyCompare = Integer.compare(preyDist1, preyDist2);
+
+                        if (preyCompare != 0) {
+                            // If one move is better for hunting, use it.
+                            return preyCompare;
+                        } else {
+                            // choose moves that is farthest away from our own tail for more open space.
+                            int tailDist1 = calculateDistance(getNextCoord(m1, head), myTail);
+                            int tailDist2 = calculateDistance(getNextCoord(m2, head), myTail);
+
+                            return Integer.compare(tailDist2, tailDist1);
+                        }
+                    });
                     return saferHuntingMoves.get(0);
                 }
                 // if all hunting moves are risky, we wont hunt
